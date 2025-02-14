@@ -15,9 +15,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create(
-            'roles', function (Blueprint $table) {
+            'roles',
+            function (Blueprint $table) {
                 $table->id();
-                $table->enum('name', array_column(ROLE::cases(), 'value'));
+                $table->enum('name', array_column(ROLE::cases(), 'value'))->unique();
                 $table->timestamps();
             }
         );

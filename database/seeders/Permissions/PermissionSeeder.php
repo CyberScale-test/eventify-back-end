@@ -27,11 +27,12 @@ class PermissionSeeder extends Seeder
         $userRole = $this->aclService->createRole(ROLE_ENUM::USER);
         $adminRole = $this->aclService->createRole(ROLE_ENUM::ADMIN);
 
+
         // Create scoped permissions
         $this->aclService->createScopePermissions('users', ['create', 'read', 'update', 'delete']);
 
         // Assign permissions to roles
-        $this->aclService->assignScopePermissionsToRole($adminRole, 'users', ['create', 'read', 'update', 'delete']);
+        $this->aclService->assignScopePermissionsToRole($adminRole, 'users', ['create', 'read', 'update', 'delete',]);
     }
 
     public function rollback()

@@ -19,12 +19,14 @@ class DatabaseSeeder extends Seeder
         $this->call(self::seeders());
     }
 
-    public static function seeders()
+    public static function seeders(): array
     {
         $seeders = [
             PermissionSeeder::class,
             CrudPermissionSeeder::class,
             UserSeeder::class,
+            CitySeeder::class,
+            EventSeeder::class,
         ];
         if (! App::environment('prod') && ! App::environment('preprod')) {
             $seeders = array_merge($seeders, []);
