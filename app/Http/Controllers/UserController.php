@@ -31,7 +31,7 @@ class UserController extends CrudController
 
             return parent::createOne($request);
         } catch (\Exception $e) {
-            Log::error('Error caught in function UserController.createOne : '.$e->getMessage());
+            Log::error('Error caught in function UserController.createOne : ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -44,7 +44,7 @@ class UserController extends CrudController
             $roleEnum = ROLE::from($request->role);
             $item->syncRoles([$roleEnum]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function UserController.afterCreateOne : '.$e->getMessage());
+            Log::error('Error caught in function UserController.afterCreateOne : ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -62,7 +62,7 @@ class UserController extends CrudController
 
             return parent::updateOne($id, $request);
         } catch (\Exception $e) {
-            Log::error('Error caught in function UserController.updateOne : '.$e->getMessage());
+            Log::error('Error caught in function UserController.updateOne : ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -75,10 +75,34 @@ class UserController extends CrudController
             $roleEnum = ROLE::from($request->role);
             $item->syncRoles([$roleEnum]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function UserController.afterUpdateOne : '.$e->getMessage());
+            Log::error('Error caught in function UserController.afterUpdateOne : ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
+        }
+    }
+
+    public function getParticipatedEvents(User $user)
+    {
+        try {
+
+            Log::info('Attempting to participate in events for user:', ['user_id' => $user->id]);
+            $participatedEvents = $user->participatedEvents()->pluck('event_id')->toArray(); // Get IDs of participated events
+            Log::info('Fetched participated events:', ['event_ids' => $participatedEvents]);
+            return response()->json([
+                'success' => true,
+                'data' => $participatedEvents,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching participated events:', [
+                'user_id' => $user->id,
+                'error_message' => $e->getMessage(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error while fetching for participated events',
+                'error' => [$e->getMessage()],
+            ], 500);
         }
     }
 }

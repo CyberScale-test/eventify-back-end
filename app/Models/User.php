@@ -74,7 +74,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
 
     public function participatedEvents(): BelongsToMany
     {
-        return $this->belongsToMany(Event::class)
+        return $this->belongsToMany(Event::class, 'event_user')
             ->withPivot('participated_at')
             ->withTimestamps();
     }

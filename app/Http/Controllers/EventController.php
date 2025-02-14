@@ -93,7 +93,10 @@ class EventController extends CrudController
             $user = Auth::user();
             if (!$user) {
                 Log::error('Participate: No authenticated user found.');
-                return response()->json(['message' => 'User not authenticated.'], 401);
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['User not authenticated.']
+                ], 401);
             }
 
             // log authenticated user details
@@ -102,7 +105,10 @@ class EventController extends CrudController
             // check if the event has available seats
             if ($event->seats_available <= 0) {
                 Log::warning('Participate: No available seats for event:', ['event_id' => $event->id]);
-                return response()->json(['message' => 'No available seats.'], 400);
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['No available seats.']
+                ], 400);
             }
 
             // check if the user is already participating in the event
@@ -111,7 +117,10 @@ class EventController extends CrudController
                     'user_id' => $user->id,
                     'event_id' => $event->id,
                 ]);
-                return response()->json(['message' => 'You are already participating in this event.'], 400);
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['You are already participating in this event.']
+                ], 400);
             }
 
             // attach the user to the event
