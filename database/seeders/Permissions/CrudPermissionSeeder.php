@@ -22,7 +22,7 @@ class CrudPermissionSeeder extends Seeder
 
 
 
-        //My BODYGUARD
+        //My BODYGUARD.
         if (!$adminRole) {
             $adminRole = $this->aclService->createRole(ROLE_ENUM::ADMIN);
         }

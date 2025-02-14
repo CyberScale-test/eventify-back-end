@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 
+
 class AuthController extends Controller
 {
     public function me(Request $request)
@@ -36,7 +37,7 @@ class AuthController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            Log::error('Error caught in function AuthController.me: '.$e->getMessage());
+            Log::error('Error caught in function AuthController.me: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -59,7 +60,7 @@ class AuthController extends Controller
 
             return response()->json(['success' => true, 'message' => __('auth.login_success'), 'data' => ['token' => $token]]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function AuthController.login: '.$e->getMessage());
+            Log::error('Error caught in function AuthController.login: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -89,7 +90,7 @@ class AuthController extends Controller
                 }
             );
         } catch (\Exception $e) {
-            Log::error('Error caught in function AuthController.register: '.$e->getMessage());
+            Log::error('Error caught in function AuthController.register: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -104,7 +105,7 @@ class AuthController extends Controller
 
             return response()->json(['success' => true, 'message' => __('auth.logout_success')]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function AuthController.logout: '.$e->getMessage());
+            Log::error('Error caught in function AuthController.logout: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -128,7 +129,7 @@ class AuthController extends Controller
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function AuthController.requestPasswordReset: '.$e->getMessage());
+            Log::error('Error caught in function AuthController.requestPasswordReset: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -161,7 +162,7 @@ class AuthController extends Controller
                 }
             );
         } catch (\Exception $e) {
-            Log::error('Error caught in function AuthController.resetPassword: '.$e->getMessage());
+            Log::error('Error caught in function AuthController.resetPassword: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);

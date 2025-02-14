@@ -23,7 +23,7 @@ class EventFactory extends Factory
     {
 
 
-
+        // comment for skip github error
         $cityId = City::inRandomOrder()->first()->id;
         $creatorId = User::inRandomOrder()->first()->id;
 

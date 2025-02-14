@@ -61,7 +61,7 @@ abstract class CrudController extends Controller
                     }
                     $model = app($this->getModelClass());
                     $customValidationMsgs = method_exists($model, 'validationMessages') ? $model->validationMessages() : [];
-                    $validated = $request->validate(app($this->getModelClass())->rules(), $customValidationMsgs);
+                    $validated = $request->validate(app($this->getModelClass())->rules('create'), $customValidationMsgs);
                     $model = $this->model()->create($validated);
 
                     if (method_exists($this, 'afterCreateOne')) {
@@ -72,7 +72,7 @@ abstract class CrudController extends Controller
                         [
                             'success' => true,
                             'data' => ['item' => $model],
-                            'message' => __($this->getTable().'.created'),
+                            'message' => __($this->getTable() . '.created'),
                         ]
                     );
                 }
@@ -80,7 +80,7 @@ abstract class CrudController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'errors' => Arr::flatten($e->errors())]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function CrudController.createOne: '.$e->getMessage());
+            Log::error('Error caught in function CrudController.createOne: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -90,6 +90,7 @@ abstract class CrudController extends Controller
     public function readOne($id, Request $request)
     {
         try {
+            Log::info("Attempting to read user with ID: $id");
             if (in_array('read_one', $this->restricted)) {
                 $user = $request->user();
                 if (! $user->hasPermission($this->getTable(), 'read', $id)) {
@@ -123,7 +124,7 @@ abstract class CrudController extends Controller
                 return response()->json(
                     [
                         'success' => false,
-                        'errors' => [__($this->getTable().'.not_found')],
+                        'errors' => [__($this->getTable() . '.not_found')],
                     ]
                 );
             }
@@ -139,7 +140,7 @@ abstract class CrudController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            Log::error('Error caught in function CrudController.readOne: '.$e->getMessage());
+            Log::error('Error caught in function CrudController.readOne: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -149,7 +150,9 @@ abstract class CrudController extends Controller
     public function readAll(Request $request)
     {
         try {
+
             $user = $request->user();
+
             if (in_array('read_all', $this->restricted)) {
                 if (! $user->hasPermission($this->getTable(), 'read') && ! $user->hasPermission($this->getTable(), 'read_own')) {
                     return response()->json(
@@ -193,7 +196,7 @@ abstract class CrudController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            Log::error('Error caught in function CrudController.readAll: '.$e->getMessage());
+            Log::error('Error caught in function CrudController.readAll: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -219,7 +222,7 @@ abstract class CrudController extends Controller
 
                     $model = app($this->getModelClass());
                     $customValidationMsgs = method_exists($model, 'validationMessages') ? $model->validationMessages() : [];
-                    $validated = $request->validate(app($this->getModelClass())->rules(), $customValidationMsgs);
+                    $validated = $request->validate(app($this->getModelClass())->rules('update'), $customValidationMsgs);
 
                     $model = $this->model()->find($id);
 
@@ -227,7 +230,7 @@ abstract class CrudController extends Controller
                         return response()->json(
                             [
                                 'success' => false,
-                                'errors' => [__($this->getTable().'.not_found')],
+                                'errors' => [__($this->getTable() . '.not_found')],
                             ]
                         );
                     }
@@ -243,7 +246,7 @@ abstract class CrudController extends Controller
                             'success' => true,
                             'data' => ['item' => $model],
                             'validated' => $validated,
-                            'message' => __($this->getTable().'.updated'),
+                            'message' => __($this->getTable() . '.updated'),
                         ]
                     );
                 }
@@ -251,7 +254,7 @@ abstract class CrudController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'errors' => Arr::flatten($e->errors())]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function CrudController.updateOne: '.$e->getMessage());
+            Log::error('Error caught in function CrudController.updateOne: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -280,7 +283,7 @@ abstract class CrudController extends Controller
                         return response()->json(
                             [
                                 'success' => false,
-                                'errors' => [__($this->getTable().'.not_found')],
+                                'errors' => [__($this->getTable() . '.not_found')],
                             ]
                         );
                     }
@@ -300,7 +303,7 @@ abstract class CrudController extends Controller
                             'success' => true,
                             'data' => ['item' => $model],
                             'validated' => $validated,
-                            'message' => __($this->getTable().'.updated'),
+                            'message' => __($this->getTable() . '.updated'),
                         ]
                     );
                 }
@@ -308,7 +311,7 @@ abstract class CrudController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'errors' => Arr::flatten($e->errors())]);
         } catch (\Exception $e) {
-            Log::error('Error caught in function CrudController.patchOne: '.$e->getMessage());
+            Log::error('Error caught in function CrudController.patchOne: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
@@ -338,7 +341,7 @@ abstract class CrudController extends Controller
                         return response()->json(
                             [
                                 'success' => false,
-                                'errors' => [__($this->getTable().'.not_found')],
+                                'errors' => [__($this->getTable() . '.not_found')],
                             ]
                         );
                     }
@@ -356,13 +359,13 @@ abstract class CrudController extends Controller
                     return response()->json(
                         [
                             'success' => true,
-                            'message' => __($this->getTable().'.deleted'),
+                            'message' => __($this->getTable() . '.deleted'),
                         ]
                     );
                 }
             );
         } catch (\Exception $e) {
-            Log::error('Error caught in function CrudController.deleteOne: '.$e->getMessage());
+            Log::error('Error caught in function CrudController.deleteOne: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
 
             return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]]);
