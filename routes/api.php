@@ -71,12 +71,11 @@ Route::middleware('auth:api')->group(
                         Route::patch('/{id}', 'patchOne');
                         Route::delete('/{id}', 'deleteOne');
                         Route::get('/{user}/participated-events', 'getParticipatedEvents');
+                        Route::get('/{id}/events', 'getCreatedEventsByUser');
                     }
                 );
             }
         );
-
-
 
 
         Route::prefix('events')->name('events.')->group(

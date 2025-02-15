@@ -85,24 +85,60 @@ class UserController extends CrudController
     public function getParticipatedEvents(User $user)
     {
         try {
+            Log::info('Fetching events participated-in by user:', ['user_id' => $user->id]);
 
-            Log::info('Attempting to participate in events for user:', ['user_id' => $user->id]);
-            $participatedEvents = $user->participatedEvents()->pluck('event_id')->toArray(); // Get IDs of participated events
-            Log::info('Fetched participated events:', ['event_ids' => $participatedEvents]);
+            // Fetch participated events with pagination and include the 'city' relationship
+            $participatedEvents = $user->participatedEvents()->with('city')->paginate(request('perPage', 20));
+
+            Log::info('Fetched participated events:', ['events' => $participatedEvents->pluck('id')->toArray()]);
+
             return response()->json([
                 'success' => true,
-                'data' => $participatedEvents,
+                'data' => [
+                    'items' => $participatedEvents->items(), // Corrected line
+                    'meta' => [
+                        'currentPage' => $participatedEvents->currentPage(),
+                        'lastPage' => $participatedEvents->lastPage(),
+                        'totalItems' => $participatedEvents->total(),
+                        'perPage' => $participatedEvents->perPage(), // Added perPage to match the other function
+                    ],
+                ],
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error fetching participated events:', [
                 'user_id' => $user->id,
                 'error_message' => $e->getMessage(),
             ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error while fetching for participated events',
-                'error' => [$e->getMessage()],
+                'message' => 'Error while fetching participated events',
+                'errors' => [$e->getMessage()],
             ], 500);
+        }
+    }
+
+    public function getCreatedEventsByUser($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $events = $user->createdEvents()->paginate(request('perPage', 20)); // paginate results like in the front 
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'items' => $events->items(),
+                    'meta' => [
+                        'currentPage' => $events->currentPage(),
+                        'lastPage' => $events->lastPage(),
+                        'totalItems' => $events->total(),
+                        'perPage' => $events->perPage(),
+                    ],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching created events by user: ' . $e->getMessage());
+            return response()->json(['success' => false, 'errors' => ['An error occurred while fetching events.']], 500);
         }
     }
 }
