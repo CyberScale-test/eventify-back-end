@@ -7,6 +7,7 @@ use App\Models\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\EventParticipationNotification;
 
 class EventController extends CrudController
 
@@ -137,6 +138,13 @@ class EventController extends CrudController
                 'booked_seats' => $event->booked_seats,
                 'seats_available' => $event->seats_available,
             ]);
+
+            // notify the event creator via email
+            Log::info('Attempting to notify creator');
+            $creator = $event->creator;
+            if ($creator) {
+                $creator->notify(new EventParticipationNotification($event, $user));
+            }
 
             return response()->json([
                 'success' => true,
