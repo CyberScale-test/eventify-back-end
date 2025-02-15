@@ -7,10 +7,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EventParticipationNotification extends Notification
+class EventParticipationNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    public $tries = 3;
     /**
      * Create a new notification instance.
      */
