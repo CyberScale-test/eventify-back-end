@@ -36,7 +36,7 @@ class EventParticipationNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('New Participant for you Event.')
+            ->subject('New Participant for your Event.')
             ->greeting("Hello {$notifiable->name},")
             ->line("A NEW user has participated in your event '{$this->event->title}'")
             ->line("Participant Name: {$this->participant->name}")

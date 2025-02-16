@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\EventParticipationNotification;
+use App\Events\EventUpdated;
+use DB;
 
 class EventController extends CrudController
 
@@ -77,99 +79,102 @@ class EventController extends CrudController
     }
 
 
-    public function participate(Request $request, Event $event)
+    public function participate(Event $event)
     {
         try {
-
-            Log::info('Participate: Resolved event:', [
+            Log::info('Processing participation request', [
                 'event_id' => $event->id,
                 'event_title' => $event->title,
                 'seats_available' => $event->seats_available,
+                'user_id' => Auth::id()
             ]);
 
-            // log incoming request data
-            Log::info('Participate: Incoming request data:', $request->all());
-
-            // check if the user is authenticated
             $user = Auth::user();
+
+            // Early returns for validation checks
             if (!$user) {
-                Log::error('Participate: No authenticated user found.');
-                return response()->json([
-                    'success' => false,
-                    'errors' => ['User not authenticated.']
-                ], 401);
+                return $this->error('User not authenticated.', 401);
             }
 
-            // log authenticated user details
-            Log::info('Participate: Authenticated user:', ['user_id' => $user->id]);
-
-            // check if the event has available seats
             if ($event->seats_available <= 0) {
-                Log::warning('Participate: No available seats for event:', ['event_id' => $event->id]);
-                return response()->json([
-                    'success' => false,
-                    'errors' => ['No available seats.']
-                ], 400);
+                return $this->error('No available seats for this event.', 400);
             }
 
-            // check if the user is already participating in the event
+
+            // in case the user click on participated before it disabled cuz no time to perfect the app :(
             if ($event->participants()->where('user_id', $user->id)->exists()) {
-                Log::warning('Participate: User already participating in event:', [
-                    'user_id' => $user->id,
-                    'event_id' => $event->id,
+                return $this->error('You are already participating in this event.', 400);
+            }
+
+            // to ensure data consistency
+            DB::beginTransaction();
+            try {
+
+                $event->participants()->attach($user->id, [
+                    'participated_at' => now(),
                 ]);
+
+
+                $event->update([
+                    'booked_seats' => DB::raw('booked_seats + 1'),
+                    'seats_available' => DB::raw('seats_available - 1')
+                ]);
+
+                // Refresh the event to get updated counts
+                $event->refresh();
+
+                // Send notification outside transaction
+                DB::commit();
+
+                // Dispatch notification to creators
+                if ($event->creator) {
+                    $event->creator->notify(new EventParticipationNotification($event, $user));
+                }
+
+                Log::info('Participation successful', [
+                    'event_id' => $event->id,
+                    'user_id' => $user->id,
+                    'remaining_seats' => $event->seats_available
+                ]);
+
                 return response()->json([
-                    'success' => false,
-                    'errors' => ['You are already participating in this event.']
-                ], 400);
+                    'success' => true,
+                    'message' => 'Successfully joined the event.',
+                    'data' => [
+                        'seats_available' => $event->seats_available,
+                        'booked_seats' => $event->booked_seats
+                    ]
+                ], 200);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
             }
-
-            // attach the user to the event
-            $event->participants()->attach($user->id, [
-                'participated_at' => now(),
-            ]);
-
-            // update seat counts
-            $event->increment('booked_seats');
-            $event->decrement('seats_available');
-
-            Log::info('Participate: Seats updated for event:', [
-                'event_id' => $event->id,
-                'booked_seats' => $event->booked_seats,
-                'seats_available' => $event->seats_available,
-            ]);
-
-            // notify the event creator via email
-            Log::info('Attempting to notify creator');
-            $creator = $event->creator;
-            if ($creator) {
-                $creator->notify(new EventParticipationNotification($event, $user));
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Successfully participated.'
-            ], 200);
         } catch (\Exception $e) {
-
-            Log::error('Participate: Error during participation:', [
+            Log::error('Failed to process participation', [
                 'event_id' => $event->id,
-                'error_message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
-            return response()->json(['message' => 'An error occurred while participating.'], 500);
+            return $this->error('Failed to process your participation request. Please try again.', 500);
         }
     }
 
+    // front-end starter's orders
+    private function error(string $message, int $statusCode)
+    {
+        return response()->json([
+            'success' => false,
+            'errors' => [$message]
+        ], $statusCode);
+    }
 
 
-
-    public function afterCreateOne($item, $request)
+    public function afterCreateOne($event, $request)
     {
         try {
 
-            Log::info("Event created: " . $item->id);
+            Log::info("Event created: " . $event->id);
         } catch (\Exception $e) {
             Log::error('Error caught in function EventController.afterCreateOne: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
@@ -183,9 +188,6 @@ class EventController extends CrudController
         try {
             Log::info("Attempting to update event with ID: $id");
 
-            // remove the creator_id from the request to prevent modification check me later
-            $request->request->remove('creator_id');
-
             // call the parent method to handle validation and update
             return parent::updateOne($id, $request);
         } catch (\Exception $e) {
@@ -195,10 +197,14 @@ class EventController extends CrudController
         }
     }
 
-    public function afterUpdateOne($item, $request)
+    public function afterUpdateOne($event)
     {
         try {
-            Log::info("Event updated: " . $item->id);
+            Log::info("Event updated: " . $event->id);
+            // brodcasting
+            broadcast(new EventUpdated($event))->toOthers();
+
+            Log::info("Updates broadcasted to participant: " . $event->id);
         } catch (\Exception $e) {
             Log::error('Error caught in function EventController.afterUpdateOne: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
@@ -212,8 +218,8 @@ class EventController extends CrudController
     {
         try {
             $model = $this->getModelClass();
-            $item = $model::findOrFail($id);
-            $item->delete();
+            $event = $model::findOrFail($id);
+            $event->delete();
             return response()->json(['success' => true, 'message' => __('common.success_deleted')]);
         } catch (\Exception $e) {
             Log::error('Error caught in function EventController.deleteOne: ' . $e->getMessage());

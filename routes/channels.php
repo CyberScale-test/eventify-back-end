@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -14,7 +15,12 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel(
-    'App.Models.User.{id}', function ($user, $id) {
+    'App.Models.User.{id}',
+    function ($user, $id) {
         return (int) $user->id === (int) $id;
     }
 );
+
+Broadcast::channel('event-participants.{eventId}', function (User $user, $eventId) {
+    return $user->participatedEvents()->where('event_id', $eventId)->exists();
+});

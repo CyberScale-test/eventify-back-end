@@ -61,7 +61,7 @@ class Event extends Model
             $rules['title'] = 'sometimes|string|max:255';
             $rules['start_time'] = 'nullable|date';
             $rules['end_time'] = 'nullable|date|after:start_time';
-            $rules['capacity'] = 'nullable|integer|min:1';
+            $rules['capacity'] = 'nullable|integer|min:0';
         }
 
         return $rules;
