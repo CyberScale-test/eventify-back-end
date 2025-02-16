@@ -1,21 +1,77 @@
-## Getting Started
+# Eventify Backend (Laravel) 🚀
 
-# Tech Stack
+This is the backend repository for **Eventify**, an event management platform. Built with Laravel, it provides APIs for user authentication, event management, and notifications.
 
-- Auth : Sanctum
+---
 
-# Setup
+## ✨ Features
 
-## VSCode
+- **User Authentication**  
+  Secure registration and login using Laravel Sanctum
 
-- Install PHP CS FIXER
+- **Event Management**
 
-## Roles & Permissions
+  - Create, update, and delete events.
 
-- At the start of the project, you want to setup the roles and permissions.
-- You can do this by editing the `database/seeders/PermissionSeeder.php` file.
+- **Notifications**
 
-## Users
+  - Email notifications to creators when users join their events.
+  - Real-time updates for participants when event details change.
 
-- At the start of the project, you want to create default users.
-- You can do this by editing the `database/seeders/UserSeeder.php` file.
+- **API Endpoints**  
+  RESTful APIs for seamless integration with the frontend.
+
+---
+
+## 🛠 Tech Stack
+
+- **Framework**: Laravel (PHP)
+- **Database**: MySQL
+- **Authentication**: Laravel Sanctum
+- **Email Notifications**: Laravel Mail (SMTP)
+- **API Testing**: Postman
+
+---
+
+## 🚀 Installation
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/CyberScale-test/eventify-back-end.git
+   cd eventify-back-end
+   ```
+2. **Install the composer**
+
+```bash
+composer install
+```
+
+3. **Install the composer**
+
+```bash
+cp .env.example .env
+```
+
+4. **Generate the key**
+
+```bash
+php artisan key:generate
+```
+
+5. **migrate and seed**
+
+```bash
+php artisan migrate --seed
+```
+
+6. **Run the server**
+
+```bash
+php artisan serve
+```
+
+7. **Install Pusher**
+
+```bash
+composer require pusher/pusher-php-server
+```
