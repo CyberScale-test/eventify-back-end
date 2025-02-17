@@ -40,22 +40,27 @@ This is the backend starter repository for **Eventify**, an event management pla
 
    ```bash
    git clone https://github.com/CyberScale-test/eventify-back-end.git
-   cd eventify-back-end
    ```
 
-2. **Install the composer**
+2. **Enter Folder**
 
 ```bash
-composer install
+cd eventify-back-end
 ```
 
 3. **Install the composer**
 
 ```bash
+composer install
+```
+
+4. **Copy in .env**
+
+```bash
 cp .env.example .env
 ```
 
-4. **Create Database**
+5. **Create Database**
 
 ```bash
 mysql -u root -p
@@ -63,7 +68,7 @@ CREATE DATABASE eventify;
 exit;
 ```
 
-5. **Configure Database in your .env**
+6. **Configure Database in your .env**
 
 ```bash
 DB_CONNECTION=mysql
@@ -74,25 +79,25 @@ DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
 
-6. **Generate App Key**
+7. **Generate App Key**
 
 ```bash
 php artisan key:generate
 ```
 
-7. **Run Migrations & Seeders**
+8. **Run Migrations & Seeders**
 
 ```bash
 php artisan migrate --seed
 ```
 
-8. **Install Pusher for Real-time Notification**
+9. **Install Pusher for Real-time Notification**
 
 ```bash
 composer require pusher/pusher-php-server
 ```
 
-9. **Configure Pusher in your .env**
+10. **Configure Pusher in your .env**
 
 ```bash
 PUSHER_APP_ID=your_app_id
@@ -103,7 +108,7 @@ PUSHER_SCHEME=https
 PUSHER_APP_CLUSTER=your_app_cluster
 ```
 
-10. **Configure Mailtrap**
+11. **Configure Mailtrap**
 
 ```bash
 MAIL_MAILER=smtp
@@ -115,7 +120,7 @@ MAIL_FROM_ADDRESS="noreply@evenitify.com"
 MAIL_FROM_NAME="${API_NAME}"
 ```
 
-11. **Start the server**
+12. **Start the server**
 
 ```bash
 php artisan serve
