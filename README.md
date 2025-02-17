@@ -37,10 +37,12 @@ This is the backend starter repository for **Eventify**, an event management pla
 ## 🚀 Installation
 
 1. **Clone the Repository**
+
    ```bash
    git clone https://github.com/CyberScale-test/eventify-back-end.git
    cd eventify-back-end
    ```
+
 2. **Install the composer**
 
 ```bash
@@ -92,15 +94,18 @@ composer require pusher/pusher-php-server
 
 9. **Configure Pusher in your .env**
 
+```bash
 PUSHER_APP_ID=your_app_id
 PUSHER_APP_KEY=your_app_key
 PUSHER_APP_SECRET=your_app_secret
 PUSHER_PORT=443
 PUSHER_SCHEME=https
 PUSHER_APP_CLUSTER=your_app_cluster
+```
 
 10. **Configure Mailtrap**
 
+```bash
 MAIL_MAILER=smtp
 MAIL_HOST=localhost
 MAIL_PORT=2525
@@ -108,6 +113,7 @@ MAIL_USERNAME=
 MAIL_PASSWORD=
 MAIL_FROM_ADDRESS="noreply@evenitify.com"
 MAIL_FROM_NAME="${API_NAME}"
+```
 
 11. **Start the server**
 
